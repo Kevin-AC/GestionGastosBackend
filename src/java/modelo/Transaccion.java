@@ -1,24 +1,23 @@
-
 package modelo;
 
-
 public class Transaccion {
- private int idTransaccion;
+
+    private int idTransaccion;
     private double monto;
     private String descripcion;
     private String fecha;
     private int idUsuario;
     private int categoria_id;
-    
-    
-    public Transaccion() {}
+
+    public Transaccion() {
+    }
 
     // Constructor para insertar datos nuevos
     public Transaccion(double monto, String descripcion, String fecha, int id, int categoria_id) {
         this.monto = monto;
         this.descripcion = descripcion;
         this.fecha = fecha;
-        this.idUsuario= id;
+        this.idUsuario = id;
         this.categoria_id = categoria_id;
     }
 
@@ -69,5 +68,5 @@ public class Transaccion {
     public void setCategoria_id(int categoria_id) {
         this.categoria_id = categoria_id;
     }
-    
+
 }

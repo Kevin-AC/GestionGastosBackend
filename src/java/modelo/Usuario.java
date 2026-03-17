@@ -1,9 +1,6 @@
-
 package modelo;
 
-
 public class Usuario {
-    
 
     private String nombre;
     private String apellido;
@@ -18,8 +15,6 @@ public class Usuario {
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
-
-    
 
     public String getNombre() {
         return nombre;

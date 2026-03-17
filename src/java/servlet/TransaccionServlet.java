@@ -1,6 +1,4 @@
-
 package servlet;
-
 
 import dao.TransaccionDAO;
 import conexion.Conexion;
@@ -14,46 +12,71 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import modelo.Transaccion;
 
-
 @WebServlet(name = "TransaccionServlet", urlPatterns = {"/TransaccionServlet"})
 public class TransaccionServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         try {
-
-            // Obtener datos del formulario
-            int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
-            int idCategoria = Integer.parseInt(request.getParameter("categoria_id"));
-            double monto = Double.parseDouble(request.getParameter("monto"));
-            String descripcion = request.getParameter("descripcion");
-            String fecha = request.getParameter("fecha");
-
-            // Crear objeto transaccion
-            Transaccion t = new Transaccion();
-
-            t.setIdUsuario(idUsuario);
-            t.setCategoria_id(idCategoria);
-            t.setMonto(monto);
-            t.setDescripcion(descripcion);
-            t.setFecha(fecha);
-
-            // Conectar a la base de datos
+            // 1. Obtener la acción que el usuario quiere realizar
+            String accion = request.getParameter("accion");
+            if (accion == null) {
+                accion = "insertar"; // Acción por defecto
+            }
+            // 2. Conectar a la base de datos (Tu lógica actual)
             Conexion cn = new Conexion();
             Connection con = cn.conectar();
-
-            // Guardar en la base de datos
             TransaccionDAO dao = new TransaccionDAO(con);
-            dao.insertar(t);
-            
+
+            boolean resultado = false;
+            String mensaje = "";
+
+            // 3. Lógica según la acción
+            if (accion.equals("insertar") || accion.equals("actualizar")) {
+
+                // Capturamos los datos del formulario
+                double monto = Double.parseDouble(request.getParameter("monto"));
+                String descripcion = request.getParameter("descripcion");
+                String fecha = request.getParameter("fecha");
+                int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+                int idCategoria = Integer.parseInt(request.getParameter("categoria_id"));
+
+                Transaccion t = new Transaccion();
+                t.setMonto(monto);
+                t.setDescripcion(descripcion);
+                t.setFecha(fecha);
+                t.setIdUsuario(idUsuario);
+                t.setCategoria_id(idCategoria);
+
+                if (accion.equals("insertar")) {
+                    resultado = dao.insertar(t);
+                    mensaje = "Transacción guardada con éxito";
+                } else {
+                    // Para actualizar necesitamos el ID de la transacción
+                    int idTransaccion = Integer.parseInt(request.getParameter("idTransaccion"));
+                    t.setIdTransaccion(idTransaccion);
+                    resultado = dao.actualizar(t);
+                    mensaje = "Transacción actualizada con éxito";
+                }
+
+            } else if (accion.equals("eliminar")) {
+                int idTransaccion = Integer.parseInt(request.getParameter("idTransaccion"));
+                int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+                resultado = dao.eliminar(idTransaccion, idUsuario);
+                mensaje = "Transacción eliminada";
+            }
+
+            // 4. Respuesta en formato JSON
             response.setContentType("application/json;charset=UTF-8");
             PrintWriter out = response.getWriter();
-            out.println("{\"success\": true, \"message\": \"Usuario registrado\"}");
+            out.println("{\"success\": " + resultado + ", \"message\": \"" + mensaje + "\"}");
             out.flush();
-    
+
         } catch (Exception e) {
             e.printStackTrace();
+            // Enviar error al frontend en caso de fallo
+            response.setStatus(500);
         }
     }
 
@@ -70,8 +93,7 @@ public class TransaccionServlet extends HttpServlet {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        
-        
+
         processRequest(request, response);
     }
 
