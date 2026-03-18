@@ -65,6 +65,15 @@ public class TransaccionServlet extends HttpServlet {
                 int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
                 resultado = dao.eliminar(idTransaccion, idUsuario);
                 mensaje = "Transacción eliminada";
+            } else if (accion.equals("ObtenerBalance")){
+                int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+                double saldoTotal = dao.obtenerSaldoTotal(idUsuario);
+                
+                response.setContentType("application/json;charset=UTF-8");
+                PrintWriter out = response.getWriter();
+                out.print("{\"success\": true, \"saldo\": " + saldoTotal + "}");
+                out.flush();
+                return;
             }
 
             // 4. Respuesta en formato JSON
