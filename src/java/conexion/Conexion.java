@@ -17,7 +17,7 @@ public class Conexion {
         con = DriverManager.getConnection(
             "jdbc:mysql://localhost:3306/gestor_gastos_finan",
             "root",
-            ""
+            "12345678"
         );
 
         System.out.println("Conexion exitosa");
