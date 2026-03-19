@@ -34,8 +34,8 @@ public class UsuarioServlet extends HttpServlet {
             u.setCorreo(request.getParameter("correo"));
             u.setContrasena(request.getParameter("contrasena"));
 
-            UsuarioDAO dao = new UsuarioDAO();
-            dao.insertar(u);
+           // UsuarioDAO dao = new UsuarioDAO(con);//falta arreglar error aqui
+            //dao.insertar(u);
 
             response.setContentType("application/json;charset=UTF-8");
             PrintWriter out = response.getWriter();
