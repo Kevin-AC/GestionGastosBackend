@@ -1,4 +1,4 @@
-package servlets;  // ← Ajusta tu paquete
+package servlet;  // ← Ajusta tu paquete
 
 import dao.TransaccionDAO;
 import modelo.Transaccion;
