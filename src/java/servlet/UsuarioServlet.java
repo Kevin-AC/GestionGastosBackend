@@ -205,10 +205,10 @@ public class UsuarioServlet extends HttpServlet {
             }
 
             if ("eliminar".equalsIgnoreCase(accion)) {
-                String idParam = request.getParameter("idUsuario");
-                if (idParam == null || idParam.isEmpty()) {
-                    String body = new BufferedReader(request.getReader()).lines().collect(Collectors.joining());
-                    idParam = extractJsonField(body, "idUsuario");
+                String idParam = extractJsonField(bodyTmp, "idUsuario");
+
+                if (idParam == null) {
+                    idParam = request.getParameter("idUsuario");
                 }
                 if (idParam == null || idParam.isEmpty()) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
