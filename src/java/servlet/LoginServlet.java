@@ -44,25 +44,24 @@ public class LoginServlet extends HttpServlet {
             // Extraer identificador y contraseña (JSON o form params)
             String identificador = null;
             String contrasena = null;
+           
+
             if (body != null && !body.isEmpty()) {
                 identificador = extractJsonField(body, "identificador");
                 if (identificador == null) identificador = extractJsonField(body, "correo");
                 contrasena = extractJsonField(body, "password");
                 if (contrasena == null) contrasena = extractJsonField(body, "contrasena");
+                 System.out.println("🔍 identificador extraído: [" + identificador + "]");
+                 System.out.println("🔍 contrasena extraída: [" + contrasena + "]");
             } else {
-                identificador = request.getParameter("identificador");
-                if (identificador == null) identificador = request.getParameter("correo");
-                contrasena = request.getParameter("password");
-                if (contrasena == null) contrasena = request.getParameter("contrasena");
-            }
-
-            if (identificador == null || contrasena == null) {
+                // Si no hay JSON, error
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 try (PrintWriter out = response.getWriter()) {
-                    out.println("{\"success\":false,\"message\":\"Faltan credenciales\"}");
+                    out.println("{\"success\":false,\"message\":\"No se recibió JSON\"}");
                 }
                 return;
             }
+
 
             // Conectar y validar
             Conexion cn = new Conexion();
@@ -93,13 +92,19 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession(true);
             session.setAttribute("idUsuario", usuario.getId());
             session.setAttribute("nombreUsuario", usuario.getNombre());
-            // Si manejas roles/admin, setear isAdmin aquí (ejemplo: false por defecto)
+            session.setAttribute("apellidoUsuario", usuario.getApellido());
             session.setAttribute("isAdmin", Boolean.FALSE);
+            
+            StringBuilder json = new StringBuilder();
+            json.append("{\"success\":true,\"message\":\"Login exitoso\",\"user\":{")
+               .append("\"idUsuario\":").append(usuario.getId()).append(",")
+               .append("\"id\":").append(usuario.getId()).append(",")
+               .append("\"nombre\":\"").append(escape(usuario.getNombre())).append("\",")
+               .append("\"apellido\":\"").append(escape(usuario.getApellido())).append("\",")
+               .append("\"correo\":\"").append(escape(usuario.getCorreo())).append("\"}}");
 
             try (PrintWriter out = response.getWriter()) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                out.println("{\"success\":true,\"message\":\"Login exitoso\",\"user\":{\"id\":" + usuario.getId()
-                        + ",\"nombre\":\"" + escape(usuario.getNombre()) + "\",\"correo\":\"" + escape(usuario.getCorreo()) + "\"}}");
+                out.println(json.toString());
             }
 
         } catch (Exception e) {
@@ -113,31 +118,45 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    // Extra: método simple para extraer campos de JSON sin librería
-    private String extractJsonField(String json, String field) {
-        try {
-            if (json == null) return null;
-            String key = "\"" + field + "\"";
-            int idx = json.indexOf(key);
-            if (idx == -1) return null;
-            int colon = json.indexOf(":", idx);
-            if (colon == -1) return null;
-            int start = colon + 1;
-            while (start < json.length() && Character.isWhitespace(json.charAt(start))) start++;
-            char c = json.charAt(start);
-            if (c == '\"') {
-                int end = json.indexOf("\"", start + 1);
-                if (end == -1) return null;
-                return json.substring(start + 1, end);
-            } else {
-                int end = start;
-                while (end < json.length() && json.charAt(end) != ',' && json.charAt(end) != '}' && !Character.isWhitespace(json.charAt(end))) end++;
-                return json.substring(start, end).trim();
-            }
-        } catch (Exception e) {
+        // extraer campos de JSON sin librería
+        private String extractJsonField(String json, String field) {
+        System.out.println("🔍🔍 Buscando '" + field + "' en JSON: " + json);
+
+        if (json == null || json.trim().isEmpty()) {
+            System.out.println("🔍🔍 JSON vacío o null");
             return null;
         }
+
+        // Buscar exactamente el campo
+        String keyPattern = "\"" + field + "\":";
+        int idx = json.indexOf(keyPattern);
+        System.out.println("🔍🔍 keyPattern encontrada en posición: " + idx);
+
+        if (idx == -1) {
+            System.out.println("🔍🔍 Campo '" + field + "' NO encontrado");
+            return null;
+        }
+
+        int start = idx + keyPattern.length();
+        while (start < json.length() && Character.isWhitespace(json.charAt(start))) start++;
+
+        if (start >= json.length() || json.charAt(start) != '"') {
+            System.out.println("🔍🔍 No es string value");
+            return null;
+        }
+
+        start++; // saltar "
+        int end = json.indexOf("\"", start);
+        if (end == -1) {
+            System.out.println("🔍🔍 No se encontró cierre de comillas");
+            return null;
+        }
+
+        String resultado = json.substring(start, end);
+        System.out.println("🔍🔍 RESULTADO para '" + field + "': [" + resultado + "]");
+        return resultado;
     }
+
 
     private void setCorsHeaders(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");

@@ -94,13 +94,9 @@ public class UsuarioDAO {
         return null;
     }
 
-    /**
-     * Valida usuario por correo o nombre y contraseña.
-     * Devuelve Usuario si las credenciales coinciden, null en caso contrario.
-     * IMPORTANTE: en producción compara hashes en lugar de texto plano.
-     */
+    
     public Usuario validarUsuario(String correoONombre, String contrasena) {
-        String sql = "SELECT id, nombre, correo FROM usuario WHERE (correo = ? OR nombre = ?) AND password = ?";
+        String sql = "SELECT id, nombre,apellido, correo FROM usuario WHERE (correo = ? OR nombre = ?) AND password = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, correoONombre);
             ps.setString(2, correoONombre);
@@ -110,6 +106,7 @@ public class UsuarioDAO {
                     Usuario u = new Usuario();
                     u.setId(rs.getInt("id"));
                     u.setNombre(rs.getString("nombre"));
+                    u.setApellido(rs.getString("apellido"));
                     u.setCorreo(rs.getString("correo"));
                     return u;
                 }

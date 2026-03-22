@@ -13,7 +13,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-@WebServlet("/ListaIngresosServlet")  // ✅ Nuevo endpoint
+@WebServlet("/ListaIngresosServlet") 
 public class ListaIngresosServlet extends HttpServlet {
     
     @Override
@@ -43,7 +43,7 @@ public class ListaIngresosServlet extends HttpServlet {
             TransaccionDAO dao = new TransaccionDAO(con);
             int usuarioId = Integer.parseInt(request.getParameter("idUsuario"));
             
-            // ✅ CAMBIO: listarIngresos 
+            // listarIngresos 
             System.out.println("🔄 DEBUG: Llamando listarIngresos(" + usuarioId + ")");
             List<Transaccion> ingresos = dao.listarIngresos(usuarioId);  // 
             System.out.println("📊 DEBUG: Ingresos encontrados: " + ingresos.size());
