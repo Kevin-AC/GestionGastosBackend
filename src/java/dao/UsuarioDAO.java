@@ -57,22 +57,39 @@ public class UsuarioDAO {
         }
     }
 
-    /**
-     * Elimina un usuario por id. Devuelve true si se eliminó al menos una fila.
-     */
-    public boolean eliminarUsuario(int idUsuario) throws SQLException {
-        String sql = "DELETE FROM usuario WHERE id = ?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, idUsuario);
-            int filas = ps.executeUpdate();
-            return filas > 0;
+    
+        public boolean eliminarUsuario(int idUsuario) throws SQLException {
+        con.setAutoCommit(false);  // transacción
+
+        try {
+            // 1. Eliminar transacciones PRIMERO
+            String sqlTrans = "DELETE FROM transacciones WHERE usuario_id = ?";
+            try (PreparedStatement psTrans = con.prepareStatement(sqlTrans)) {
+                psTrans.setInt(1, idUsuario);
+                int transEliminadas = psTrans.executeUpdate();
+                System.out.println("🗑️ Transacciones eliminadas: " + transEliminadas);
+            }
+
+            // 2. Eliminar usuario
+            String sqlUser = "DELETE FROM usuario WHERE id = ?";
+            try (PreparedStatement psUser = con.prepareStatement(sqlUser)) {
+                psUser.setInt(1, idUsuario);
+                int usuariosEliminados = psUser.executeUpdate();
+                System.out.println("🗑️ Usuarios eliminados: " + usuariosEliminados);
+
+                con.commit();  // confirmar
+                return usuariosEliminados > 0;
+            }
+        } catch (SQLException e) {
+            con.rollback();  // deshacer si falla
+            throw e;
+        } finally {
+            con.setAutoCommit(true);
         }
     }
 
-    /**
-     * Obtiene un usuario por id (sin password).
-     * Devuelve null si no existe.
-     */
+
+    
     public Usuario obtenerPorId(int id) {
         String sql = "SELECT id, nombre, apellido, telefono, correo FROM usuario WHERE id = ?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {

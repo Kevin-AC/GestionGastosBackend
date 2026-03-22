@@ -231,7 +231,7 @@ public class UsuarioServlet extends HttpServlet {
                 HttpSession session = request.getSession(false);
                 Integer idSesion = (session != null && session.getAttribute("idUsuario") instanceof Integer) ? (Integer) session.getAttribute("idUsuario") : null;
                 Boolean isAdmin = (session != null && session.getAttribute("isAdmin") instanceof Boolean) ? (Boolean) session.getAttribute("isAdmin") : Boolean.FALSE;
-
+                /*
                 if (idSesion == null && !isAdmin) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     try (PrintWriter out = response.getWriter()) {
@@ -239,6 +239,7 @@ public class UsuarioServlet extends HttpServlet {
                     }
                     return;
                 }
+                
                 if (!isAdmin && idSesion != null && idSesion.intValue() != idUsuarioEliminar) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     try (PrintWriter out = response.getWriter()) {
@@ -246,7 +247,7 @@ public class UsuarioServlet extends HttpServlet {
                     }
                     return;
                 }
-
+                */
                 try {
                     boolean eliminado = dao.eliminarUsuario(idUsuarioEliminar);
                     try (PrintWriter out = response.getWriter()) {

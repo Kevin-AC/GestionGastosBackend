@@ -93,7 +93,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("idUsuario", usuario.getId());
             session.setAttribute("nombreUsuario", usuario.getNombre());
             session.setAttribute("apellidoUsuario", usuario.getApellido());
-            session.setAttribute("isAdmin", Boolean.FALSE);
+            //session.setAttribute("isAdmin",usuario.getEsAdmin() || false);
             
             StringBuilder json = new StringBuilder();
             json.append("{\"success\":true,\"message\":\"Login exitoso\",\"user\":{")
