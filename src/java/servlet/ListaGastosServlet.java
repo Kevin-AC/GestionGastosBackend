@@ -32,22 +32,29 @@ public class ListaGastosServlet extends HttpServlet {
         
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
-        
         Connection con = null;
+        
         try {
             System.out.println("🔥 DEBUG: Servlet iniciado");
             
-              // ← TU CLASE EXACTA
+             String idUsuarioStr = request.getParameter("idUsuario");
+                if (idUsuarioStr == null || idUsuarioStr.isEmpty()) {
+                    response.setStatus(400);
+                    out.print("{\"error\":\"Falta idUsuario\"}");
+                    return;
+                }
+
+            
+            int usuarioId = Integer.parseInt(idUsuarioStr);
+            System.out.println("👤 Usuario solicitado: " + usuarioId);
+            
             conexion.Conexion conexion = new conexion.Conexion();
             con = conexion.conectar();
-            
-            System.out.println("✅ DEBUG: Conexión OK: " + (con != null));
-            
             TransaccionDAO dao = new TransaccionDAO(con);
-            int usuarioId = 1;
             
-            System.out.println("🔄 DEBUG: Llamando listarGastos(" + usuarioId + ")");
+           
             List<Transaccion> gastos = dao.listarGastos(usuarioId);
+            
             System.out.println("📊 DEBUG: Gastos encontrados: " + gastos.size());
             
             out.print("[");

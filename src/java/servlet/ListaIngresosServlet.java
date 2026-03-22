@@ -41,14 +41,14 @@ public class ListaIngresosServlet extends HttpServlet {
             con = conexion.conectar();
             
             TransaccionDAO dao = new TransaccionDAO(con);
-            int usuarioId = 1;
+            int usuarioId = Integer.parseInt(request.getParameter("idUsuario"));
             
-            // ✅ CAMBIO: listarIngresos (tu DAO)
+            // ✅ CAMBIO: listarIngresos 
             System.out.println("🔄 DEBUG: Llamando listarIngresos(" + usuarioId + ")");
-            List<Transaccion> ingresos = dao.listarIngresos(usuarioId);  // ← DAO tuyo
+            List<Transaccion> ingresos = dao.listarIngresos(usuarioId);  // 
             System.out.println("📊 DEBUG: Ingresos encontrados: " + ingresos.size());
             
-            // ✅ IGUAL JSON
+            //  JSON
             out.print("[");
             for (int i = 0; i < ingresos.size(); i++) {
                 Transaccion t = ingresos.get(i);
